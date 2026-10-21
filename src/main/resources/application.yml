@@ -1,0 +1,55 @@
+server:
+  port: ${PORT:8090}
+  # 종료 신호를 받으면 진행 중인 묶음(업로드 → 삭제 → 커밋)까지 마치고 내린다
+  shutdown: graceful
+
+spring:
+  application:
+    name: snsb3-history
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD:}
+    hikari:
+      maximum-pool-size: 3
+      # 이력 시각(timestamptz → JSON 문자열)을 한국 시간으로 — RDS 기본 시간대는 UTC
+      connection-init-sql: SET TIME ZONE 'Asia/Seoul'
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  task:
+    scheduling:
+      # 업로드(relay)와 지표 갱신이 서로 밀리지 않게
+      pool:
+        size: 2
+      shutdown:
+        await-termination: true
+        await-termination-period: 30s
+
+relay:
+  batch-size: ${RELAY_BATCH_SIZE:500}
+  flush-interval-ms: ${RELAY_FLUSH_INTERVAL_MS:60000}
+  poll-interval-ms: ${RELAY_POLL_INTERVAL_MS:10000}
+  max-batch-bytes: ${RELAY_MAX_BATCH_BYTES:16777216}
+  row-tries: ${RELAY_ROW_TRIES:2}
+  outage-threshold: ${RELAY_OUTAGE_THRESHOLD:3}
+  backoff-initial-ms: ${RELAY_BACKOFF_INITIAL_MS:1000}
+  backoff-max-ms: ${RELAY_BACKOFF_MAX_MS:60000}
+  # 전환 기간: 이력 테이블에도 같이 쓴다. 테이블과 S3 를 비교 검증한 뒤 false 로 끈다
+  dual-write-table: ${RELAY_DUAL_WRITE_TABLE:true}
+  metrics-interval-ms: ${RELAY_METRICS_INTERVAL_MS:15000}
+
+backfill:
+  enabled: ${BACKFILL_ENABLED:false}
+  batch-size: ${BACKFILL_BATCH_SIZE:5000}
+
+s3:
+  bucket: ${S3_BUCKET}
+  prefix: ${S3_PREFIX:}
+  region: ${S3_REGION:ap-northeast-2}
+  endpoint: ${S3_ENDPOINT:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
