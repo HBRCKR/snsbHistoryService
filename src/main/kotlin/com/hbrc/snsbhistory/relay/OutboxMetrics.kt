@@ -1,4 +1,4 @@
-package com.hbrc.snsb3history.relay
+package com.hbrc.snsbhistory.relay
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Gauge

@@ -1,4 +1,4 @@
-package com.hbrc.snsb3history.relay
+package com.hbrc.snsbhistory.relay
 
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty

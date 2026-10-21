@@ -1,4 +1,4 @@
-# snsb3_history
+# snsb_history
 
 snsb3_api 의 변경 이력 아웃박스(`history_outbox`)를 S3 에 올리는 서비스 — PMWEB-TK-671. EC2 에 따로 띄운다.
 설계: snsb3_api `docs/history-outbox-s3-plan.md`
@@ -104,8 +104,8 @@ DB_URL=jdbc:postgresql://<host>:5432/<DB> DB_USERNAME=... DB_PASSWORD=... S3_BUC
 ```bash
 brew install minio
 MINIO_ROOT_USER=localtest MINIO_ROOT_PASSWORD=localtest-secret minio server /tmp/minio-snsb3 --address :9000 --console-address :9001
-curl --aws-sigv4 "aws:amz:us-east-1:s3" --user localtest:localtest-secret -X PUT http://localhost:9000/snsb3-history-local
-S3_BUCKET=snsb3-history-local S3_ENDPOINT=http://localhost:9000 AWS_ACCESS_KEY_ID=localtest AWS_SECRET_ACCESS_KEY=localtest-secret \
+curl --aws-sigv4 "aws:amz:us-east-1:s3" --user localtest:localtest-secret -X PUT http://localhost:9000/snsb-history-local
+S3_BUCKET=snsb-history-local S3_ENDPOINT=http://localhost:9000 AWS_ACCESS_KEY_ID=localtest AWS_SECRET_ACCESS_KEY=localtest-secret \
 DB_URL=... ./gradlew bootRun
 ```
 

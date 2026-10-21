@@ -1,4 +1,4 @@
-package com.hbrc.snsb3history.relay
+package com.hbrc.snsbhistory.relay
 
 import java.time.OffsetDateTime
 import java.time.ZoneId

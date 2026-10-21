@@ -1,6 +1,6 @@
-package com.hbrc.snsb3history
+package com.hbrc.snsbhistory
 
-import com.hbrc.snsb3history.relay.S3Properties
+import com.hbrc.snsbhistory.relay.S3Properties
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
@@ -14,7 +14,7 @@ import java.net.URI
 @SpringBootApplication
 @EnableScheduling
 @ConfigurationPropertiesScan
-class Snsb3HistoryApplication {
+class SnsbHistoryApplication {
     /** 자격 증명은 기본 체인(EC2 인스턴스 역할, 로컬은 AWS_ACCESS_KEY_ID·AWS_SECRET_ACCESS_KEY) */
     @Bean
     fun s3Client(properties: S3Properties): S3Client = S3Client.builder()
@@ -29,5 +29,5 @@ class Snsb3HistoryApplication {
 }
 
 fun main(args: Array<String>) {
-    runApplication<Snsb3HistoryApplication>(*args)
+    runApplication<SnsbHistoryApplication>(*args)
 }

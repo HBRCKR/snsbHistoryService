@@ -1,1 +1,1 @@
-rootProject.name = "snsb3_history"
+rootProject.name = "snsb_history"
