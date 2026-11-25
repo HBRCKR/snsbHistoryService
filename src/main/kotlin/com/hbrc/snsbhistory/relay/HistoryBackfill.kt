@@ -69,6 +69,7 @@ class HistoryBackfill(
             HistoryTarget.TEST_SUB -> Keys("t.examinee_id", "h.test_id", "h.id", "LEFT JOIN test t ON t.id = h.test_id")
             HistoryTarget.EXAMINEE -> Keys("h.id", "NULL", "NULL", "")
             HistoryTarget.STAFF -> error("직원 이력은 예전 테이블이 없어 백필하지 않는다")
+            HistoryTarget.TEST -> error("검사 이력은 예전 테이블이 없어 백필하지 않는다")
         }
         return """
             SELECT h.history_id, coalesce(h.changed_at, h.updated_at, h.created_at) AS changed_at,

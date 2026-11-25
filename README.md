@@ -26,7 +26,7 @@ snsb3_api ──(변경과 같은 트랜잭션)──▶ history_outbox ──(s
 ## S3 형식
 
 ```
-s3://{bucket}/{prefix/}{test_sub|examinee|staff}/dt=YYYY-MM-DD/hour=HH/{첫 outbox id}-{끝 outbox id}.jsonl.gz
+s3://{bucket}/{prefix/}{test_sub|examinee|staff|test}/dt=YYYY-MM-DD/hour=HH/{첫 outbox id}-{끝 outbox id}.jsonl.gz
 ```
 
 - 한 줄 = 이력 한 건(JSON). gzip 으로 압축한다.
