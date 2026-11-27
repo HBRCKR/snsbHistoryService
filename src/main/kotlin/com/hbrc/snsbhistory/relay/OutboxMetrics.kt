@@ -58,7 +58,7 @@ class OutboxMetrics(private val jdbc: JdbcTemplate, registry: MeterRegistry) {
 
     fun s3ConfigError() = s3ConfigErrors.increment()
 
-    fun movedToDead(target: HistoryTarget) = deadMoved.getValue(target).increment()
+    fun movedToDead(target: HistoryTarget, count: Int) = deadMoved.getValue(target).increment(count.toDouble())
 
     fun relayed(target: HistoryTarget, count: Int) = relayed.getValue(target).increment(count.toDouble())
 
