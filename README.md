@@ -53,7 +53,22 @@ s3://{bucket}/{prefix/}{test_sub|examinee|staff|test}/dt=YYYY-MM-DD/hour=HH/{첫
 | 업로드 실패(S3·네트워크 장애, 시간 초과 30초) | 묶음 전체를 롤백해 아웃박스에 보존하고 **이력 종류별 지수 백오프(최대 60초)** 뒤 같은 묶음을 다시 올린다 — 장애 중에는 어떤 행도 DLT 로 가지 않고, 한 종류가 막혀도 다른 종류는 계속 올린다 |
 | 권한·버킷 없음(403·404) | 위와 같이 다시 시도하되 설정 오류 지표를 따로 올린다 — 사람이 고쳐야 한다 |
 
-DLT 이동은 업로드와 따로 커밋한다 — 업로드가 실패해도 보낼 수 없는 행은 치워진다. 한 건씩 나눠 다시 쓰지 않는다. S3 파일 이름은 시각·outbox id 로만 정해지고 업로드는 파일째 되거나 안 되므로, 검사를 통과한 행 하나 때문에 업로드가 실패하지 않는다. 그래도 계속 실패하면 그 종류는 앞에서 멈추고(순서 유지) 가장 오래된 이력 나이 지표로 드러난다.
+DLT 이동은 업로드와 따로 커밋한다 — 업로드가 실패해도 보낼 수 없는 행은 치워진다. 한 건씩 나눠 다시 쓰지 않는다. S3 파일 이름은 시각·outbox id 로만 정해지고 업로드는 파일째 되거나 안 되므로, 검사를 통과한 행 하나 때문에 업로드가 실패하지 않는다. 그래도 계속 실패하면 앞에서 멈추고(순서 유지) 아래 감시의 가장 오래된 이력 나이 알람으로 드러난다.
+
+## 감시 — outbox-monitor (Lambda)
+
+아웃박스 상태는 **relay 밖에서** 잰다. relay 안에서 세면 relay 가 꺼질 때 지표도 같이 사라지고, 여러 대면 같은 값을 대수만큼 낸다.
+
+| 무엇 | 어디서 | 지표 |
+|---|---|---|
+| 상태(적체, 가장 오래된 이력 나이, dead 수·나이) | `outbox-monitor` Lambda 가 1분마다 DB 를 직접 재서 CloudWatch(`SnsbHistory/Outbox`)로 | `Backlog`, `OldestAgeSeconds`, `DeadCount`, `DeadOldestAgeSeconds` (차원 `Stage`, 종류별은 `HistoryType` 추가) |
+| relay 가 응답하나 | 같은 Lambda 가 1분마다 relay 의 `/actuator/health`(DB 연결 포함)를 불러 응답하는 인스턴스 수를 CloudWatch 로 | `RelayHealthyInstances` (주소는 `RELAY_HEALTH_URLS`, 쉼표로 여러 개) |
+| 사건(올린 수, dead 로 옮긴 수, S3 실패) | relay 의 `/actuator/prometheus` | `history_relayed_total`, `history_dead_moved_total`, `history_s3_put_failures_total`, `history_s3_config_errors_total` — 여러 대면 `sum(rate(...))` |
+
+- 종류는 DB 값 그대로라, relay 가 아직 모르는 종류가 쌓여도 잡힌다.
+- 이력이 들어오는데 relay 가 멈추면 `OldestAgeSeconds` 가 오른다. 저장이 없는 시간(밤)에는 아웃박스가 비어 나이로는 모르므로 `RelayHealthyInstances` 가 1 아래로 떨어지는 것으로 잡는다. 감시 Lambda 자체가 멈춰 값이 안 오면 두 알람 모두 "데이터 없음"을 경보로 본다.
+- CloudWatch 알람이 상태를 바꾸면 SNS 가 같은 Lambda 를 불러 Discord 웹훅으로 보낸다(넘을 때 한 번, 회복될 때 한 번).
+- 빌드: `outbox-monitor/build.sh` → `dist/index.js`. 설정은 `outbox-monitor/src/index.ts` 맨 위 주석.
 
 ## S3 버킷 보안·비용
 

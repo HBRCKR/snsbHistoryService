@@ -9,7 +9,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
  * @param maxBatchBytes 묶음 하나(파일)에 담는 줄의 합계 크기 상한 — 메모리 보호. 줄 크기를 DB 에서 먼저 재서 이만큼만 읽어 온다.
  *   한 건이 이보다 크면 보내지 않고 dead 로(실제 최대 rawData 는 수 MB — 넉넉히 위)
  * @param backoffInitialMs 업로드 실패(S3·DB 장애) 때 첫 재시도 간격 — 같은 묶음을 다시 올린다. 실패할 때마다 두 배, [backoffMaxMs] 까지
- * @param metricsIntervalMs 적체·dead 지표를 다시 세는 주기
  */
 @ConfigurationProperties("relay")
 data class RelayProperties(
@@ -19,7 +18,6 @@ data class RelayProperties(
     val maxBatchBytes: Long = 16L * 1024 * 1024,
     val backoffInitialMs: Long = 1_000,
     val backoffMaxMs: Long = 60_000,
-    val metricsIntervalMs: Long = 15_000,
 )
 
 /**

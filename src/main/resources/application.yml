@@ -18,9 +18,9 @@ spring:
     timeout-per-shutdown-phase: 30s
   task:
     scheduling:
-      # 업로드(relay)와 지표 갱신이 서로 밀리지 않게
+      # 예약 작업은 relay 하나 — 한 인스턴스 안에서 relay 가 겹쳐 돌지 않는다
       pool:
-        size: 2
+        size: 1
       shutdown:
         await-termination: true
         await-termination-period: 30s
@@ -32,7 +32,6 @@ relay:
   max-batch-bytes: ${RELAY_MAX_BATCH_BYTES:16777216}
   backoff-initial-ms: ${RELAY_BACKOFF_INITIAL_MS:1000}
   backoff-max-ms: ${RELAY_BACKOFF_MAX_MS:60000}
-  metrics-interval-ms: ${RELAY_METRICS_INTERVAL_MS:15000}
 
 backfill:
   enabled: ${BACKFILL_ENABLED:false}

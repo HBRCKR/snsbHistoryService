@@ -263,7 +263,7 @@ class OutboxRelayTest {
         DataSourceTransactionManager(dataSource),
         uploader,
         RelayProperties(batchSize = batchSize, maxBatchBytes = maxBatchBytes, flushIntervalMs = flushIntervalMs),
-        OutboxMetrics(jdbc, SimpleMeterRegistry()),
+        OutboxMetrics(SimpleMeterRegistry()),
     )
 
     private fun drain(relay: OutboxRelay) {
