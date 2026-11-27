@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter
 /**
  * 이력 종류. 이름은 snsb3_api 의 HistoryType 과 같아야 한다(history_outbox.history_type 값).
  * @param typeName S3 경로 첫 칸·줄의 history_type
- * @param historyTable 예전 이력 테이블 — 전환 기간 이중 쓰기·백필 대상. 직원·검사 이력은 예전 테이블이 없어 S3 에만 쓴다(빈 값)
+ * @param historyTable 예전 이력 테이블 — 백필(테이블 → S3) 대상. 직원·검사 이력은 예전 테이블이 없다(빈 값)
  */
 enum class HistoryTarget(val typeName: String, val historyTable: String) {
     TEST_SUB("test_sub", "test_sub_history"),
@@ -17,7 +17,7 @@ enum class HistoryTarget(val typeName: String, val historyTable: String) {
     TEST("test", ""),
     ;
 
-    /** 예전 이력 테이블이 있나 — 이중 쓰기·백필은 있는 종류만 */
+    /** 예전 이력 테이블이 있나 — 백필은 있는 종류만 */
     val hasHistoryTable: Boolean get() = historyTable.isNotEmpty()
 }
 

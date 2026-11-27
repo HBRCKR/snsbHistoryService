@@ -9,6 +9,7 @@ import org.springframework.scheduling.annotation.EnableScheduling
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
 import java.net.URI
+import java.time.Duration
 
 /** snsb3_api 가 남긴 이력 아웃박스(history_outbox)를 모아 S3 에 올리는 서비스 — PMWEB-TK-671 */
 @SpringBootApplication
@@ -19,6 +20,11 @@ class SnsbHistoryApplication {
     @Bean
     fun s3Client(properties: S3Properties): S3Client = S3Client.builder()
         .region(Region.of(properties.region))
+        // 시간 상한 — 업로드 동안 아웃박스 트랜잭션·행 잠금을 쥐고 있으므로, 느린 S3 에 오래 묶이지 않게 실패로 끊는다
+        .overrideConfiguration { config ->
+            config.apiCallTimeout(Duration.ofMillis(properties.callTimeoutMs))
+                .apiCallAttemptTimeout(Duration.ofMillis(properties.attemptTimeoutMs))
+        }
         .apply {
             if (properties.endpoint.isNotBlank()) {
                 endpointOverride(URI.create(properties.endpoint))

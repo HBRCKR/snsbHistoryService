@@ -1,0 +1,21 @@
+{
+  "name": "outbox-monitor",
+  "private": true,
+  "description": "history_outbox 상태를 relay 밖에서 재서 CloudWatch 로 올리고, 알람을 Discord 로 보내는 Lambda",
+  "scripts": {
+    "build": "./build.sh",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@aws-sdk/client-cloudwatch": "^3.700.0",
+    "@aws-sdk/client-secrets-manager": "^3.700.0",
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^20.17.6",
+    "@types/pg": "^8.11.10",
+    "esbuild": "^0.24.0",
+    "typescript": "^5.6.3"
+  }
+}

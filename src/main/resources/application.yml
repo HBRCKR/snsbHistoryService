@@ -18,9 +18,9 @@ spring:
     timeout-per-shutdown-phase: 30s
   task:
     scheduling:
-      # 업로드(relay)와 지표 갱신이 서로 밀리지 않게
+      # 예약 작업은 relay 하나 — 한 인스턴스 안에서 relay 가 겹쳐 돌지 않는다
       pool:
-        size: 2
+        size: 1
       shutdown:
         await-termination: true
         await-termination-period: 30s
@@ -30,26 +30,25 @@ relay:
   flush-interval-ms: ${RELAY_FLUSH_INTERVAL_MS:60000}
   poll-interval-ms: ${RELAY_POLL_INTERVAL_MS:10000}
   max-batch-bytes: ${RELAY_MAX_BATCH_BYTES:16777216}
-  row-tries: ${RELAY_ROW_TRIES:2}
-  outage-threshold: ${RELAY_OUTAGE_THRESHOLD:3}
   backoff-initial-ms: ${RELAY_BACKOFF_INITIAL_MS:1000}
   backoff-max-ms: ${RELAY_BACKOFF_MAX_MS:60000}
-  # 전환 기간: 이력 테이블에도 같이 쓴다. 테이블과 S3 를 비교 검증한 뒤 false 로 끈다
-  dual-write-table: ${RELAY_DUAL_WRITE_TABLE:true}
-  metrics-interval-ms: ${RELAY_METRICS_INTERVAL_MS:15000}
 
 backfill:
   enabled: ${BACKFILL_ENABLED:false}
   batch-size: ${BACKFILL_BATCH_SIZE:5000}
+  max-batch-bytes: ${BACKFILL_MAX_BATCH_BYTES:16777216}
 
 s3:
   bucket: ${S3_BUCKET}
   prefix: ${S3_PREFIX:}
   region: ${S3_REGION:ap-northeast-2}
   endpoint: ${S3_ENDPOINT:}
+  # 업로드 한 번(SDK 재시도 포함)·시도 한 번의 시간 상한 — 업로드 동안 아웃박스 행 잠금을 쥐고 있다
+  call-timeout-ms: ${S3_CALL_TIMEOUT_MS:30000}
+  attempt-timeout-ms: ${S3_ATTEMPT_TIMEOUT_MS:10000}
 
 management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info,metrics,prometheus
